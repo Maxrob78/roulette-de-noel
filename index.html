@@ -1,353 +1,328 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>🎁 Roulette de Noël — Maxrob78</title>
-  <style>
-    :root {
-      --bg: #0b1120;
-      --accent: #7c3aed;
-      --accent2: #06b6d4;
-      --text: #e6eef5;
-      --glass: rgba(255,255,255,0.05);
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🎁 Roulette de Noël — Maxrob78</title>
+<style>
+:root {
+  --bg: #0b1120;
+  --accent: #7c3aed;
+  --accent2: #06b6d4;
+  --text: #e6eef5;
+  --glass: rgba(255,255,255,0.05);
+}
 
-    * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at 20% 20%, #0f172a, #020617 90%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
+* { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
+body {
+  margin: 0;
+  background: radial-gradient(circle at 20% 20%, #0f172a, #020617 90%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    header {
-      margin-top: 30px;
-      text-align: center;
-    }
+header { margin-top: 30px; text-align: center; }
+h1 {
+  font-size: 28px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 12px 0;
+}
 
-    h1 {
-      font-size: 28px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin: 0 0 12px 0;
-    }
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(6px);
+  border-radius: 14px;
+  padding: 16px 22px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  margin-bottom: 20px;
+}
 
-    .card {
-      background: var(--glass);
-      backdrop-filter: blur(6px);
-      border-radius: 14px;
-      padding: 16px 22px;
-      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-      margin-bottom: 20px;
-    }
+.login {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
 
-    .login {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: center;
-    }
+select {
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+}
 
-    select {
-      padding: 10px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.08);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.1);
-      cursor: pointer;
-    }
+button.luminous {
+  position: relative;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+button.luminous:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(124,58,237,0.4);
+}
+button.luminous:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-    button.luminous {
-      position: relative;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
-    button.luminous:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(124,58,237,0.4);
-    }
-    button.luminous:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+.roulette-container {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
 
-    .roulette-container {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
+.wheel-wrapper {
+  position: relative;
+  width: 320px;
+  height: 320px;
+}
 
-    .wheel {
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      background: conic-gradient(from 0deg, var(--accent) 0deg, var(--accent2) 90deg, var(--accent) 180deg, var(--accent2) 270deg, var(--accent) 360deg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 0 30px rgba(0,0,0,0.6);
-      transition: transform 4s cubic-bezier(.18,.9,.25,1);
-    }
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  transform: rotate(0deg);
+}
 
-    .indicator {
-      width: 0;
-      height: 0;
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      border-bottom: 24px solid var(--accent);
-      position: absolute;
-      top: -24px;
-      left: 50%;
-      transform: translateX(-50%);
-      filter: drop-shadow(0 0 6px var(--accent));
-    }
+.segment {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0% 0%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 4px rgba(0,0,0,0.7);
+}
 
-    #namesArea {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-content: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 13px;
-      text-align: center;
-    }
+.indicator {
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-bottom: 24px solid var(--accent);
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 6px var(--accent));
+  z-index: 2;
+}
 
-    .chip {
-      padding: 4px 8px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 999px;
-    }
+.result {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-    .result {
-      font-size: 20px;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+.list {
+  max-width: 360px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
 
-    .list {
-      max-width: 360px;
-      background: rgba(255,255,255,0.03);
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 20px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
+.person { display: flex; justify-content: space-between; padding: 6px 8px; border-bottom: 1px dashed rgba(255,255,255,0.05);}
+.badge { padding: 4px 8px; border-radius: 999px; font-size: 12px; }
+.badge.available { background: rgba(34,197,94,0.25); color: #bbf7d0; }
+.badge.assigned { background: rgba(239,68,68,0.25); color: #fecaca; }
 
-    .person {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 8px;
-      border-bottom: 1px dashed rgba(255,255,255,0.05);
-    }
+footer { margin-top: 40px; font-size: 13px; color: #9fb0c8; text-align: center; }
 
-    .badge {
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-    }
-
-    .badge.available { background: rgba(34,197,94,0.25); color: #bbf7d0; }
-    .badge.assigned { background: rgba(239,68,68,0.25); color: #fecaca; }
-
-    footer {
-      margin-top: 40px;
-      font-size: 13px;
-      color: #9fb0c8;
-      text-align: center;
-    }
-
-    @media (max-width: 700px) {
-      .wheel { width: 260px; height: 260px; }
-      .list { max-width: 90vw; }
-    }
-  </style>
+@media (max-width: 700px) {
+  .wheel-wrapper { width: 260px; height: 260px; }
+  .list { max-width: 90vw; }
+}
+</style>
 </head>
 <body>
-  <header>
-    <h1>🎁 Roulette de Noël</h1>
-    <div class="card login">
-      <label>Se connecter :</label>
-      <select id="loginSelect"></select>
-      <button id="loginBtn" class="luminous">Connexion</button>
-    </div>
-  </header>
+<header>
+  <h1>🎁 Roulette de Noël</h1>
+  <div class="card login">
+    <label>Se connecter :</label>
+    <select id="loginSelect"></select>
+    <button id="loginBtn" class="luminous">Connexion</button>
+  </div>
+</header>
 
-  <main class="roulette-container">
+<main class="roulette-container">
+  <div class="wheel-wrapper">
     <div class="indicator"></div>
-    <div class="wheel" id="wheel">
-      <div id="namesArea"></div>
-    </div>
-    <button id="spinBtn" class="luminous">🎡 Lancer la roulette</button>
-    <div id="result" class="result">Résultat : —</div>
-    <div id="myStatus" class="card" style="min-width:280px;">Non connecté</div>
-    <div class="list" id="peopleList"></div>
-  </main>
+    <div class="wheel" id="wheel"></div>
+  </div>
+  <button id="spinBtn" class="luminous">🎡 Lancer la roulette</button>
+  <div id="result" class="result">Résultat : —</div>
+  <div id="myStatus" class="card" style="min-width:280px;">Non connecté</div>
+  <div class="list" id="peopleList"></div>
+</main>
 
-  <footer>
-    ⚙️ Connecté à Firestore : roulette-372ab
-  </footer>
+<footer>
+  ⚙️ Connecté à Firestore : roulette-372ab
+</footer>
 
-  <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-  import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
-  
-  const firebaseConfig = {
-    apiKey: "AIzaSyASodoImTjzwF0rZuiQWdut3jtzYcQJ3cE",
-    authDomain: "roulette-372ab.firebaseapp.com",
-    projectId: "roulette-372ab",
-    storageBucket: "roulette-372ab.firebasestorage.app",
-    messagingSenderId: "689004074045",
-    appId: "1:689004074045:web:ee74ce800d6590ea468654",
-    measurementId: "G-ZH17Y9807B"
-  };
-  
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  
-  const loginSelect = document.getElementById('loginSelect');
-  const loginBtn = document.getElementById('loginBtn');
-  const spinBtn = document.getElementById('spinBtn');
-  const namesArea = document.getElementById('namesArea');
-  const peopleList = document.getElementById('peopleList');
-  const myStatus = document.getElementById('myStatus');
-  const result = document.getElementById('result');
-  const wheel = document.getElementById('wheel');
-  
-  let currentUser = null;
-  let peopleCache = {};
-  
-  // Écoute Firestore en temps réel
-  const peopleCol = collection(db, 'people');
-  onSnapshot(peopleCol, snap => {
-    snap.docs.forEach(d => peopleCache[d.id] = d.data());
-    renderUI();
-  });
-  
-  function renderUI() {
-    loginSelect.innerHTML = '';
-    namesArea.innerHTML = '';
-    peopleList.innerHTML = '';
-  
-    const ids = Object.keys(peopleCache).sort();
-    for (const id of ids) {
-      const opt = document.createElement('option');
-      opt.value = id;
-      opt.textContent = id;
-      loginSelect.appendChild(opt);
-    }
-  
-    ids.forEach(id => {
-      const p = peopleCache[id];
-      if (p.available && (!currentUser || id !== currentUser.id)) {
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        chip.textContent = id;
-        namesArea.appendChild(chip);
-      }
-      const row = document.createElement('div');
-      row.className = 'person';
-      const badge = document.createElement('span');
-      badge.className = 'badge ' + (p.available ? 'available' : 'assigned');
-      badge.textContent = p.available ? 'disponible' : (id === currentUser?.id ? 'Vous avez tiré : ' + p.assignedTo : 'déjà attribué');
-      row.innerHTML = `<div>${id}</div>`;
-      row.appendChild(badge);
-      peopleList.appendChild(row);
-    });
-    refreshMyStatus();
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+const firebaseConfig = { apiKey:"AIzaSyASodoImTjzwF0rZuiQWdut3jtzYcQJ3cE",
+  authDomain:"roulette-372ab.firebaseapp.com",
+  projectId:"roulette-372ab",
+  storageBucket:"roulette-372ab.firebasestorage.app",
+  messagingSenderId:"689004074045",
+  appId:"1:689004074045:web:ee74ce800d6590ea468654",
+  measurementId:"G-ZH17Y9807B"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const loginSelect = document.getElementById('loginSelect');
+const loginBtn = document.getElementById('loginBtn');
+const spinBtn = document.getElementById('spinBtn');
+const peopleList = document.getElementById('peopleList');
+const myStatus = document.getElementById('myStatus');
+const result = document.getElementById('result');
+const wheel = document.getElementById('wheel');
+
+let currentUser = null;
+let peopleCache = {};
+
+const peopleCol = collection(db,'people');
+onSnapshot(peopleCol, snap => {
+  snap.docs.forEach(d => peopleCache[d.id] = d.data());
+  renderUI();
+  renderWheel();
+});
+
+function renderUI() {
+  loginSelect.innerHTML='';
+  peopleList.innerHTML='';
+
+  const ids = Object.keys(peopleCache).sort();
+  for (const id of ids){
+    const opt = document.createElement('option'); opt.value=id; opt.textContent=id;
+    loginSelect.appendChild(opt);
   }
-  
-  loginBtn.addEventListener('click', async () => {
-    const id = loginSelect.value;
-    if (!id) return alert('Choisissez un nom dans la liste');
-    currentUser = { id };
-    const ref = doc(db, 'people', id);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) await setDoc(ref, { available: true, assignedTo: null });
-    refreshMyStatus();
+
+  peopleList.innerHTML='';
+  ids.forEach(id=>{
+    const p=peopleCache[id];
+    const row=document.createElement('div'); row.className='person';
+    const badge=document.createElement('span');
+    badge.className='badge '+(p.available?'available':'assigned');
+    badge.textContent = p.available ? 'disponible' : (id===currentUser?.id ? 'Vous avez tiré : '+p.assignedTo : 'déjà attribué');
+    row.innerHTML=`<div>${id}</div>`;
+    row.appendChild(badge);
+    peopleList.appendChild(row);
   });
-  
-  function refreshMyStatus() {
-    if (!currentUser) { myStatus.textContent = 'Non connecté'; return; }
-    const p = peopleCache[currentUser.id];
-    if (!p) return;
-    if (p.assignedTo) {
-      myStatus.innerHTML = `🎄 Connecté en tant que <b>${currentUser.id}</b><br>Vous avez tiré : <b style="color:#4ade80">${p.assignedTo}</b>`;
-      result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${p.assignedTo}</span>`;
-      spinBtn.disabled = true;
-    } else {
-      myStatus.innerHTML = `Connecté : <b>${currentUser.id}</b><br>Pas encore de tirage.`;
-      result.textContent = 'Résultat : —';
-      spinBtn.disabled = false;
-    }
+  refreshMyStatus();
+}
+
+loginBtn.addEventListener('click',async()=>{
+  const id=loginSelect.value; if(!id) return alert('Choisissez un nom');
+  currentUser={id};
+  const ref=doc(db,'people',id);
+  const snap=await getDoc(ref);
+  if(!snap.exists()) await setDoc(ref,{available:true,assignedTo:null});
+  refreshMyStatus();
+});
+
+function refreshMyStatus() {
+  if(!currentUser){ myStatus.textContent='Non connecté'; return; }
+  const p=peopleCache[currentUser.id]; if(!p) return;
+  if(p.assignedTo){
+    myStatus.innerHTML=`🎄 Connecté en tant <b>${currentUser.id}</b><br>Vous avez tiré : <b style="color:#4ade80">${p.assignedTo}</b>`;
+    result.innerHTML=`Résultat : <span style="color:#4ade80;font-weight:700">${p.assignedTo}</span>`;
+    spinBtn.disabled=true;
+  } else {
+    myStatus.innerHTML=`Connecté : <b>${currentUser.id}</b><br>Pas encore de tirage.`;
+    result.textContent='Résultat : —';
+    spinBtn.disabled=false;
   }
-  
-  spinBtn.addEventListener('click', async () => {
-    if (!currentUser) return alert('Connectez-vous d\'abord');
-    spinBtn.disabled = true;
-    result.textContent = 'Roulette en cours... 🎡';
-    wheel.style.transform = `rotate(0deg)`;
-  
-    const meRef = doc(db, 'people', currentUser.id);
-    const meSnap = await getDoc(meRef);
-    const me = meSnap.data();
-    if (me.assignedTo) { spinBtn.disabled = false; return alert('Vous avez déjà fait un tirage !'); }
-  
-    const pool = Object.entries(peopleCache)
-      .filter(([id, p]) => p.available && id !== currentUser.id)
-      .map(([id]) => id);
-  
-    if (pool.length === 0) { spinBtn.disabled = false; return alert('Personne disponible.'); }
-  
-    const picked = pool[Math.floor(Math.random() * pool.length)];
-    // Moins de rotations pour que ce soit rapide et lisible
-    const rotation = 360 + Math.random() * 180; // 1 tour + un peu aléatoire
-    wheel.style.transition = 'transform 2s cubic-bezier(.18,.9,.25,1)';
-    wheel.style.transform = `rotate(${rotation}deg)`;
-  
-    setTimeout(async () => {
-      try {
-        const targetRef = doc(db, 'people', picked);
-        const targetSnap = await getDoc(targetRef);
-        if (!targetSnap.exists() || !targetSnap.data().available)
-          return alert('La personne a déjà été attribuée.');
-  
-        await updateDoc(targetRef, { available: false, assignedTo: currentUser.id });
-        await updateDoc(meRef, { assignedTo: picked });
-        result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
-        refreshMyStatus();
-      } catch (e) {
-        console.error(e);
-        alert('Erreur : ' + e.message);
-      } finally {
-        spinBtn.disabled = false;
-        wheel.style.transition = 'none';
-        wheel.style.transform = 'rotate(0deg)';
-      }
-    }, 2200); // temps raccourci pour moins de lignes
+}
+
+function renderWheel() {
+  wheel.innerHTML='';
+  const available = Object.entries(peopleCache).filter(([id,p])=>p.available && id!==currentUser?.id);
+  const count = available.length;
+  available.forEach(([id],i)=>{
+    const seg = document.createElement('div');
+    seg.className='segment';
+    seg.textContent=id;
+    const angle=i*360/count;
+    seg.style.transform=`rotate(${angle}deg) translate(0, -50%)`;
+    seg.style.background=`conic-gradient(from ${angle}deg, hsl(${i*360/count},70%,40%), hsl(${i*360/count},70%,55%))`;
+    wheel.appendChild(seg);
   });
-  </script>
+}
+
+spinBtn.addEventListener('click',async()=>{
+  if(!currentUser) return alert('Connectez-vous d\'abord');
+  spinBtn.disabled=true;
+  result.textContent='Roulette en cours... 🎡';
+
+  const pool = Object.entries(peopleCache).filter(([id,p])=>p.available && id!==currentUser.id).map(([id])=>id);
+  if(pool.length===0){ spinBtn.disabled=false; return alert('Personne disponible.'); }
+
+  const picked = pool[Math.floor(Math.random()*pool.length)];
+  const count = pool.length;
+  const index = pool.indexOf(picked);
+  const rotationPerSegment = 360/count;
+  const totalRotation = 5*360 + index*rotationPerSegment + Math.random()*rotationPerSegment;
+
+  wheel.style.transition='transform 4s cubic-bezier(.25,.1,.25,1)';
+  wheel.style.transform=`rotate(${totalRotation}deg)`;
+
+  setTimeout(async()=>{
+    try{
+      const targetRef=doc(db,'people',picked);
+      const meRef=doc(db,'people',currentUser.id);
+      await updateDoc(targetRef,{available:false,assignedTo:currentUser.id});
+      await updateDoc(meRef,{assignedTo:picked});
+      result.innerHTML=`Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
+      refreshMyStatus();
+    }catch(e){console.error(e); alert('Erreur : '+e.message);}
+    finally{
+      spinBtn.disabled=false;
+      wheel.style.transition='none';
+      wheel.style.transform='rotate(0deg)';
+      renderWheel();
+    }
+  },4200);
+});
+</script>
 </body>
 </html>
