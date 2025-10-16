@@ -231,31 +231,31 @@ onSnapshot(peopleCol, snap => {
 });
 
 function renderUI() {
-  loginSelect.innerHTML='';
-  peopleList.innerHTML='';
+  loginSelect.innerHTML = '';
+  peopleList.innerHTML = '';
 
   const ids = Object.keys(peopleCache).sort();
-  for (const id of ids){
-    const opt = document.createElement('option'); opt.value=id; opt.textContent=id;
+  ids.forEach(id => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = id;
     loginSelect.appendChild(opt);
-  }
 
-  peopleList.innerHTML='';
-  ids.forEach(id=>{
-    const p=peopleCache[id];
-    const row=document.createElement('div'); row.className='person';
-    const badge=document.createElement('span');
-    badge.className='badge '+(p.available?'available':'assigned');
-    badge.textContent = p.available ? 'disponible' : (id===currentUser?.id ? 'Vous avez tiré : '+p.assignedTo : 'déjà attribué');
-    row.innerHTML=`<div>${id}</div>`;
+    const p = peopleCache[id];
+    const row = document.createElement('div');
+    row.className = 'person';
+    const badge = document.createElement('span');
+    badge.className = 'badge ' + (p.available ? 'available' : 'assigned');
+    badge.textContent = p.available ? 'disponible' : (id === currentUser?.id ? 'Vous avez tiré : ' + p.assignedTo : 'déjà attribué');
+    row.innerHTML = `<div>${id}</div>`;
     row.appendChild(badge);
     peopleList.appendChild(row);
   });
   refreshMyStatus();
 }
 
-// Gestion du login avec password null
-loginBtn.addEventListener('click', async ()=>{
+// Login / mot de passe null
+loginBtn.addEventListener('click', async () => {
   const id = loginSelect.value;
   const password = passwordInput.value.trim();
   if(!id) return alert('Choisissez un nom');
@@ -265,7 +265,6 @@ loginBtn.addEventListener('click', async ()=>{
   const snap = await getDoc(ref);
 
   if(!snap.exists()){
-    // Nouveau utilisateur -> créer avec mot de passe
     await setDoc(ref, {available:true, assignedTo:null, password:password});
     peopleCache[id] = {available:true, assignedTo:null, password:password};
     currentUser = {id};
@@ -273,7 +272,6 @@ loginBtn.addEventListener('click', async ()=>{
   } else {
     const data = snap.data();
     if(data.password === null){
-      // Mot de passe non défini -> on le crée
       await updateDoc(ref, {password: password});
       peopleCache[id].password = password;
       currentUser = {id};
@@ -286,7 +284,7 @@ loginBtn.addEventListener('click', async ()=>{
     }
   }
 
-  passwordInput.value='';
+  passwordInput.value = '';
   refreshMyStatus();
   renderWheel();
 });
@@ -295,58 +293,67 @@ function refreshMyStatus(){
   if(!currentUser){ myStatus.textContent='Non connecté'; return; }
   const p = peopleCache[currentUser.id]; if(!p) return;
   if(p.assignedTo){
-    myStatus.innerHTML=`🎄 Connecté en tant <b>${currentUser.id}</b><br>Vous avez tiré : <b style="color:#4ade80">${p.assignedTo}</b>`;
-    result.innerHTML=`Résultat : <span style="color:#4ade80;font-weight:700">${p.assignedTo}</span>`;
+    myStatus.innerHTML = `🎄 Connecté en tant <b>${currentUser.id}</b><br>Vous avez tiré : <b style="color:#4ade80">${p.assignedTo}</b>`;
+    result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${p.assignedTo}</span>`;
     spinBtn.disabled = true;
   } else {
-    myStatus.innerHTML=`Connecté : <b>${currentUser.id}</b><br>Pas encore de tirage.`;
-    result.textContent='Résultat : —';
-    spinBtn.disabled=false;
+    myStatus.innerHTML = `Connecté : <b>${currentUser.id}</b><br>Pas encore de tirage.`;
+    result.textContent = 'Résultat : —';
+    spinBtn.disabled = false;
   }
 }
 
 function renderWheel(){
-  wheel.innerHTML='';
+  wheel.innerHTML = '';
   if(!currentUser) return;
-  const available = Object.entries(peopleCache).filter(([id,p])=>p.available && id!==currentUser.id);
-  const count = available.length;
-  available.forEach(([id],i)=>{
+
+  const entries = Object.entries(peopleCache).filter(([id]) => id !== currentUser.id);
+  const count = entries.length;
+
+  entries.forEach(([id,p],i) => {
     const seg = document.createElement('div');
-    seg.className='segment';
-    seg.textContent=id;
-    const angle=i*360/count;
-    seg.style.transform=`rotate(${angle}deg) translate(0, -50%)`;
-    seg.style.background=`conic-gradient(from ${angle}deg, hsl(${i*360/count},70%,40%), hsl(${i*360/count},70%,55%))`;
+    seg.className = 'segment';
+    seg.textContent = id;
+    const angle = i*360/count;
+    seg.style.transform = `rotate(${angle}deg) translate(0, -50%)`;
+    // couleur différente si déjà tiré
+    if(p.available){
+      seg.style.background = `conic-gradient(from ${angle}deg, hsl(${i*360/count},70%,40%), hsl(${i*360/count},70%,55%))`;
+    } else {
+      seg.style.background = `conic-gradient(from ${angle}deg, #555555, #777777)`;
+    }
     wheel.appendChild(seg);
   });
 }
 
-spinBtn.addEventListener('click',async ()=>{
+spinBtn.addEventListener('click', async () => {
   if(!currentUser) return alert('Connectez-vous d\'abord');
-  spinBtn.disabled=true;
-  result.textContent='Roulette en cours... 🎡';
+  spinBtn.disabled = true;
+  result.textContent = 'Roulette en cours... 🎡';
 
-  const pool = Object.entries(peopleCache).filter(([id,p])=>p.available && id!==currentUser.id).map(([id])=>id);
+  const pool = Object.entries(peopleCache).filter(([id,p]) => p.available && id!==currentUser.id).map(([id])=>id);
   if(pool.length===0){ spinBtn.disabled=false; return alert('Personne disponible.'); }
 
   const picked = pool[Math.floor(Math.random()*pool.length)];
-  const count = pool.length;
-  const index = pool.indexOf(picked);
-  const rotationPerSegment = 360/count;
+
+  // calculer l'index exact dans la roue complète
+  const entries = Object.entries(peopleCache).filter(([id]) => id !== currentUser.id);
+  const index = entries.findIndex(([id]) => id === picked);
+  const rotationPerSegment = 360 / entries.length;
   const totalRotation = 5*360 + index*rotationPerSegment + Math.random()*rotationPerSegment;
 
-  wheel.style.transition='transform 4s cubic-bezier(.25,.1,.25,1)';
-  wheel.style.transform=`rotate(${totalRotation}deg)`;
+  wheel.style.transition = 'transform 4s cubic-bezier(.25,.1,.25,1)';
+  wheel.style.transform = `rotate(${totalRotation}deg)`;
 
   setTimeout(async ()=>{
     try{
-      const targetRef=doc(db,'people',picked);
-      const meRef=doc(db,'people',currentUser.id);
-      await updateDoc(targetRef,{available:false,assignedTo:currentUser.id});
+      const targetRef = doc(db,'people',picked);
+      const meRef = doc(db,'people',currentUser.id);
+      await updateDoc(targetRef,{available:false, assignedTo:currentUser.id});
       await updateDoc(meRef,{assignedTo:picked});
-      result.innerHTML=`Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
+      result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
       refreshMyStatus();
-    }catch(e){console.error(e); alert('Erreur : '+e.message);}
+    } catch(e){ console.error(e); alert('Erreur : '+e.message); }
     finally{
       spinBtn.disabled=false;
       wheel.style.transition='none';
