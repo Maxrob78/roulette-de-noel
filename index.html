@@ -254,6 +254,7 @@ function renderUI() {
   refreshMyStatus();
 }
 
+// Gestion du login avec password null
 loginBtn.addEventListener('click', async ()=>{
   const id = loginSelect.value;
   const password = passwordInput.value.trim();
@@ -266,13 +267,23 @@ loginBtn.addEventListener('click', async ()=>{
   if(!snap.exists()){
     // Nouveau utilisateur -> créer avec mot de passe
     await setDoc(ref, {available:true, assignedTo:null, password:password});
+    peopleCache[id] = {available:true, assignedTo:null, password:password};
     currentUser = {id};
     alert('Compte créé avec succès !');
   } else {
     const data = snap.data();
-    if(data.password !== password) return alert('Mot de passe incorrect !');
-    currentUser = {id};
-    alert('Connexion réussie !');
+    if(data.password === null){
+      // Mot de passe non défini -> on le crée
+      await updateDoc(ref, {password: password});
+      peopleCache[id].password = password;
+      currentUser = {id};
+      alert('Mot de passe enregistré avec succès !');
+    } else if(data.password !== password){
+      return alert('Mot de passe incorrect !');
+    } else {
+      currentUser = {id};
+      alert('Connexion réussie !');
+    }
   }
 
   passwordInput.value='';
