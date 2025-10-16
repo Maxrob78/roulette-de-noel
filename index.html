@@ -3,73 +3,217 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Roulette d'attribution — GitHub Pages + Firestore</title>
+  <title>🎁 Roulette de Noël — Maxrob78</title>
   <style>
-    :root{--bg:#0f1724;--card:#0b1220;--accent:#7c3aed;--accent-2:#06b6d4;--glass:rgba(255,255,255,0.04)}
-    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071026 0%, #071224 70%);color:#e6eef5}
-    .container{max-width:980px;margin:36px auto;padding:24px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-    h1{font-size:20px;margin:0}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;box-shadow:0 6px 30px rgba(2,6,23,0.6);}
-    .login{display:flex;gap:12px;align-items:center}
-    select{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
-    button.luminous{position:relative;padding:14px 22px;border-radius:12px;border:none;cursor:pointer;font-weight:700;letter-spacing:0.6px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;box-shadow:0 6px 30px rgba(124,58,237,0.28), 0 0 18px rgba(6,182,212,0.08);transform:translateZ(0)}
-    button.luminous:before{content:'';position:absolute;inset:-2px;border-radius:14px;background:conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,0.05), transparent 30%);filter:blur(8px);opacity:0.9;z-index:-1}
-    button.luminous.spin{padding:18px 26px;font-size:18px}
-    .main{display:grid;grid-template-columns:1fr 420px;gap:18px;margin-top:16px}
-    .roulette{min-height:360px;display:flex;align-items:center;justify-content:center;flex-direction:column}
-    .wheel{width:320px;height:320px;border-radius:50%;background:radial-gradient(circle at 50% 45%, rgba(255,255,255,0.02), transparent 20%), linear-gradient(180deg,#0b1220,#041424);display:flex;align-items:center;justify-content:center;position:relative;box-shadow:inset 0 6px 20px rgba(0,0,0,0.6), 0 12px 40px rgba(2,6,23,0.6)}
-    .wheel .names{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;padding:22px;gap:8px;text-align:center}
-    .chip{padding:6px 10px;border-radius:999px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);font-weight:600}
-    .indicator{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:18px solid var(--accent)}
-    .side{padding:12px}
-    .list{max-height:420px;overflow:auto;margin-top:12px;padding:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border-radius:10px}
-    .person{display:flex;justify-content:space-between;padding:8px 10px;border-bottom:1px dashed rgba(255,255,255,0.02)}
-    .badge{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03)}
-    .status{margin-top:12px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.12)}
-    .muted{color:#9fb0c8}
-    footer.small{margin-top:18px;color:#aac8da;font-size:13px}
+    :root {
+      --bg: #0b1120;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --text: #e6eef5;
+      --glass: rgba(255,255,255,0.05);
+    }
+
+    * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 20% 20%, #0f172a, #020617 90%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    header {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0 0 12px 0;
+    }
+
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(6px);
+      border-radius: 14px;
+      padding: 16px 22px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    .login {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    select {
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+    }
+
+    button.luminous {
+      position: relative;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+    button.luminous:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(124,58,237,0.4);
+    }
+    button.luminous:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .roulette-container {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .wheel {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--accent) 0deg, var(--accent2) 90deg, var(--accent) 180deg, var(--accent2) 270deg, var(--accent) 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      transition: transform 4s cubic-bezier(.18,.9,.25,1);
+    }
+
+    .indicator {
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-bottom: 24px solid var(--accent);
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      filter: drop-shadow(0 0 6px var(--accent));
+    }
+
+    #namesArea {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .chip {
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+    }
+
+    .result {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .list {
+      max-width: 360px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .person {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-bottom: 1px dashed rgba(255,255,255,0.05);
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .badge.available { background: rgba(34,197,94,0.25); color: #bbf7d0; }
+    .badge.assigned { background: rgba(239,68,68,0.25); color: #fecaca; }
+
+    footer {
+      margin-top: 40px;
+      font-size: 13px;
+      color: #9fb0c8;
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .wheel { width: 260px; height: 260px; }
+      .list { max-width: 90vw; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Roulette d'attribution — GitHub Pages / Firebase Firestore</h1>
-      <div class="login card">
-        <label class="muted">Se connecter :</label>
-        <select id="loginSelect"></select>
-        <button id="loginBtn" class="luminous">Me connecter</button>
-      </div>
-    </header>
+  <header>
+    <h1>🎁 Roulette de Noël</h1>
+    <div class="card login">
+      <label>Se connecter :</label>
+      <select id="loginSelect"></select>
+      <button id="loginBtn" class="luminous">Connexion</button>
+    </div>
+  </header>
 
-    <main class="main">
-      <section class="card roulette">
-        <div class="indicator"></div>
-        <div class="wheel" id="wheel">
-          <div class="names" id="namesArea"></div>
-        </div>
-        <div style="margin-top:18px;display:flex;gap:12px;align-items:center">
-          <button id="spinBtn" class="luminous spin">Lancer la roulette</button>
-          <div id="result" class="status">Résultat : <strong id="resultName">—</strong></div>
-        </div>
-      </section>
+  <main class="roulette-container">
+    <div class="indicator"></div>
+    <div class="wheel" id="wheel">
+      <div id="namesArea"></div>
+    </div>
+    <button id="spinBtn" class="luminous">🎡 Lancer la roulette</button>
+    <div id="result" class="result">Résultat : —</div>
+    <div id="myStatus" class="card" style="min-width:280px;">Non connecté</div>
+    <div class="list" id="peopleList"></div>
+  </main>
 
-      <aside class="card side">
-        <h3>Participants</h3>
-        <div class="list" id="peopleList"></div>
-        <h3 style="margin-top:12px">Mon statut</h3>
-        <div class="status" id="myStatus">Non connecté</div>
-        <footer class="small">⚙️ Connecté à Firestore : roulette-372ab</footer>
-      </aside>
-    </main>
-  </div>
+  <footer>
+    ⚙️ Connecté à Firestore : roulette-372ab
+  </footer>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+    import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
       apiKey: "AIzaSyASodoImTjzwF0rZuiQWdut3jtzYcQJ3cE",
       authDomain: "roulette-372ab.firebaseapp.com",
@@ -89,18 +233,35 @@
     const namesArea = document.getElementById('namesArea');
     const peopleList = document.getElementById('peopleList');
     const myStatus = document.getElementById('myStatus');
-    const resultName = document.getElementById('resultName');
+    const result = document.getElementById('result');
+    const wheel = document.getElementById('wheel');
 
     let currentUser = null;
     let peopleCache = {};
 
-    function renderPeople() {
+    // Écoute Firestore en temps réel
+    const peopleCol = collection(db, 'people');
+    onSnapshot(peopleCol, snap => {
+      snap.docs.forEach(d => peopleCache[d.id] = d.data());
+      renderUI();
+    });
+
+    function renderUI() {
+      loginSelect.innerHTML = '';
       namesArea.innerHTML = '';
       peopleList.innerHTML = '';
-      const keys = Object.keys(peopleCache).sort();
-      for (const id of keys) {
+
+      const ids = Object.keys(peopleCache).sort();
+      for (const id of ids) {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = id;
+        loginSelect.appendChild(opt);
+      }
+
+      ids.forEach(id => {
         const p = peopleCache[id];
-        if (p.available) {
+        if (p.available && (!currentUser || id !== currentUser.id)) {
           const chip = document.createElement('div');
           chip.className = 'chip';
           chip.textContent = id;
@@ -108,105 +269,81 @@
         }
         const row = document.createElement('div');
         row.className = 'person';
-        row.innerHTML = `<div>${id}</div><div class='badge'>${p.available ? 'disponible' : ('attribué à ' + p.assignedTo)}</div>`;
+        const badge = document.createElement('span');
+        badge.className = 'badge ' + (p.available ? 'available' : 'assigned');
+        badge.textContent = p.available ? 'disponible' : ('attribué à ' + p.assignedTo);
+        row.innerHTML = `<div>${id}</div>`;
+        row.appendChild(badge);
         peopleList.appendChild(row);
-      }
-      loginSelect.innerHTML = '';
-      for (const id of keys) {
-        const opt = document.createElement('option');
-        opt.value = id; opt.textContent = id;
-        loginSelect.appendChild(opt);
-      }
-    }
-
-    const peopleCol = collection(db, 'people');
-    onSnapshot(peopleCol, snap => {
-      snap.docs.forEach(d => { peopleCache[d.id] = d.data(); });
-      const ids = snap.docs.map(d=>d.id);
-      for (const k of Object.keys(peopleCache)) if (!ids.includes(k)) delete peopleCache[k];
-      renderPeople();
+      });
       refreshMyStatus();
-    });
-
-    function refreshMyStatus(){
-      if (!currentUser) { myStatus.textContent = 'Non connecté'; return }
-      const p = peopleCache[currentUser.id];
-      if (!p) { myStatus.textContent = 'Utilisateur inconnu'; return }
-      if (p.assignedTo) {
-        myStatus.innerHTML = `Connecté : <strong>${currentUser.id}</strong><br>Vous avez : <strong>${p.assignedTo}</strong>`;
-        resultName.textContent = p.assignedTo;
-      } else {
-        myStatus.innerHTML = `Connecté : <strong>${currentUser.id}</strong><br>Pas encore lancé la roulette.`;
-        resultName.textContent = '—';
-      }
     }
 
     loginBtn.addEventListener('click', async () => {
       const id = loginSelect.value;
-      if (!id) return alert('Choisissez un nom');
-      currentUser = {id};
+      if (!id) return alert('Choisissez un nom dans la liste');
+      currentUser = { id };
+      const ref = doc(db, 'people', id);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) await setDoc(ref, { available: true, assignedTo: null });
       refreshMyStatus();
-      const dref = doc(db, 'people', id);
-      const snapshot = await getDoc(dref);
-      if (!snapshot.exists()) {
-        await setDoc(dref, { available: true, assignedTo: null });
-      }
     });
+
+    function refreshMyStatus() {
+      if (!currentUser) { myStatus.textContent = 'Non connecté'; return; }
+      const p = peopleCache[currentUser.id];
+      if (!p) return;
+      if (p.assignedTo) {
+        myStatus.innerHTML = `🎄 Connecté en tant que <b>${currentUser.id}</b><br>Vous avez tiré : <b style="color:#4ade80">${p.assignedTo}</b>`;
+        result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${p.assignedTo}</span>`;
+      } else {
+        myStatus.innerHTML = `Connecté : <b>${currentUser.id}</b><br>Pas encore de tirage.`;
+        result.textContent = 'Résultat : —';
+      }
+    }
 
     spinBtn.addEventListener('click', async () => {
       if (!currentUser) return alert('Connectez-vous d\'abord');
-      const meDocRef = doc(db, 'people', currentUser.id);
-      const meSnap = await getDoc(meDocRef);
-      if (!meSnap.exists()) return alert('Profil inexistant');
+      spinBtn.disabled = true;
+      result.textContent = 'Roulette en cours... 🎡';
+      wheel.style.transform = `rotate(0deg)`;
+
+      const meRef = doc(db, 'people', currentUser.id);
+      const meSnap = await getDoc(meRef);
       const me = meSnap.data();
-      if (me.assignedTo) return alert('Déjà attribué');
+      if (me.assignedTo) { spinBtn.disabled = false; return alert('Vous avez déjà fait un tirage !'); }
 
-      const pool = [];
-      for (const [id, p] of Object.entries(peopleCache)) {
-        if (id === currentUser.id) continue;
-        if (p.available) pool.push(id);
-      }
-      if (pool.length === 0) return alert('Personne disponible');
+      const pool = Object.entries(peopleCache)
+        .filter(([id, p]) => p.available && id !== currentUser.id)
+        .map(([id]) => id);
 
-      const wheel = document.getElementById('wheel');
-      const randTurns = Math.floor(Math.random()*6) + 4;
-      const randExtra = Math.random() * 360;
-      const deg = randTurns*360 + randExtra;
+      if (pool.length === 0) { spinBtn.disabled = false; return alert('Personne disponible.'); }
+
+      const picked = pool[Math.floor(Math.random() * pool.length)];
+      const rotation = 1440 + Math.random() * 360; // 4 tours + aléatoire
       wheel.style.transition = 'transform 4s cubic-bezier(.18,.9,.25,1)';
-      wheel.style.transform = `rotate(${deg}deg)`;
-
-      const picked = pool[Math.floor(Math.random()*pool.length)];
+      wheel.style.transform = `rotate(${rotation}deg)`;
 
       setTimeout(async () => {
         try {
           const targetRef = doc(db, 'people', picked);
           const targetSnap = await getDoc(targetRef);
-          if (!targetSnap.exists()) return alert('La personne a disparu');
-          const target = targetSnap.data();
-          if (!target.available) return alert('Déjà pris, relancez');
+          if (!targetSnap.exists() || !targetSnap.data().available)
+            return alert('La personne a déjà été attribuée.');
+
           await updateDoc(targetRef, { available: false, assignedTo: currentUser.id });
-          await updateDoc(meDocRef, { assignedTo: picked });
-          resultName.textContent = picked;
-        } catch (err) {
-          console.error(err);
-          alert('Erreur : ' + err.message);
+          await updateDoc(meRef, { assignedTo: picked });
+          result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
+        } catch (e) {
+          console.error(e);
+          alert('Erreur : ' + e.message);
         } finally {
+          spinBtn.disabled = false;
           wheel.style.transition = 'none';
           wheel.style.transform = 'rotate(0deg)';
         }
       }, 4200);
     });
-
-    // Pour initialiser une liste par défaut, décommente la ligne ci-dessous :
-    // initDefaultNames(['Alice','Bob','Charlie']);
-    async function initDefaultNames(list){
-      for (const name of list) {
-        const ref = doc(db, 'people', name);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) await setDoc(ref, { available: true, assignedTo: null });
-      }
-      alert('Initialisation terminée');
-    }
   </script>
 </body>
 </html>
