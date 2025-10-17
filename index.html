@@ -340,24 +340,26 @@ function renderWheel() {
   });
   wheel.style.background = `conic-gradient(${gradientColors.join(',')})`;
 
-  // Noms correctement positionnés
+  // Texte dans chaque segment
+  const radius = wheel.offsetWidth/2 - 30; // distance du centre
   entries.forEach(([id], i) => {
     const segmentAngle = 360 / count;
     const angle = i * segmentAngle + segmentAngle/2; // centre du segment
-    const rad = (angle-90) * Math.PI / 180; // -90 pour aligner vertical haut
-    const radius = wheel.offsetWidth/2 - 40;
+    const rad = (angle - 90) * Math.PI / 180; // -90 pour que 0° soit en haut
     const x = radius * Math.cos(rad);
     const y = radius * Math.sin(rad);
 
     const txt = document.createElement('div');
     txt.className = 'segment-text';
     txt.textContent = id;
-    txt.style.left = '50%';
-    txt.style.top = '50%';
-    txt.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
+    txt.style.left = `calc(50% + ${x}px)`;
+    txt.style.top = `calc(50% + ${y}px)`;
+    txt.style.transform = `translate(-50%, -50%)`; // centrer le texte sur ce point
+    txt.style.whiteSpace = 'nowrap';
     wheel.appendChild(txt);
   });
 }
+
 
 spinBtn.addEventListener('click', async () => {
   if (!currentUser) return alert('Connectez-vous d\'abord');
