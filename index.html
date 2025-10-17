@@ -368,25 +368,28 @@ spinBtn.addEventListener('click', async () => {
 
   const entries = Object.entries(peopleCache).filter(([id, p]) => !p.assignedTo && id !== currentUser.id);
   const segmentCount = entries.length;
-  if (segmentCount === 0) {
-    spinBtn.disabled = false;
-    return alert("Personne disponible.");
-  }
+  if (segmentCount === 0) { spinBtn.disabled = false; return alert("Personne disponible."); }
 
-  const spins = 5 + Math.floor(Math.random() * 3); // tours complets
+  const spins = 5 + Math.floor(Math.random() * 3);
   const segmentAngle = 360 / segmentCount;
-  const randomIndex = Math.floor(Math.random() * segmentCount); // segment choisi
-  const randomOffset = Math.random() * segmentAngle; // position aléatoire dans le segment
+  const randomIndex = Math.floor(Math.random() * segmentCount);
+  const randomOffset = Math.random() * segmentAngle;
 
-  // Angle final **cumulé** sans modulo
+  // Angle final **cumulé**, jamais modulo
   const finalRotation = currentRotation + spins * 360 + (randomIndex * segmentAngle + segmentAngle / 2 + randomOffset);
 
-  // Animation de la roue
-  wheel.style.transition = "transform 5s cubic-bezier(0.17,0.89,0.32,1.28)";
-  wheel.style.transform = `rotate(${finalRotation}deg)`;
+  // Reset transition pour forcer le navigateur à prendre la rotation actuelle comme départ
+  wheel.style.transition = "none";
+  wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-  // On stocke la rotation réelle, pas modulo
-  currentRotation = finalRotation;
+  // Forcer le rendu avant de lancer l'animation
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      wheel.style.transition = "transform 5s cubic-bezier(0.17,0.89,0.32,1.28)";
+      wheel.style.transform = `rotate(${finalRotation}deg)`;
+      currentRotation = finalRotation;
+    });
+  });
 
   setTimeout(() => {
     wheel.classList.add("glow");
@@ -394,7 +397,6 @@ spinBtn.addEventListener('click', async () => {
   }, 4900);
 
   setTimeout(async () => {
-    // Utiliser modulo ici seulement pour trouver le segment final
     const pickedIndex = Math.floor(((currentRotation % 360) + segmentAngle/2) / segmentAngle) % segmentCount;
     const picked = entries[pickedIndex][0];
 
