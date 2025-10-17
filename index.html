@@ -362,41 +362,56 @@ function renderWheel() {
 
 
 spinBtn.addEventListener('click', async () => {
-  if (!currentUser) return alert('Connectez-vous d\'abord');
+  if (!currentUser) return alert("Connectez-vous d'abord");
   spinBtn.disabled = true;
-  result.textContent = 'Roulette en cours... 🎡';
+  result.textContent = "Roulette en cours... 🎡";
 
-  const entries = Object.entries(peopleCache).filter(([id,p]) => !p.assignedTo && id !== currentUser.id);
-  if(entries.length === 0){ spinBtn.disabled = false; return alert('Personne disponible.'); }
+  const entries = Object.entries(peopleCache).filter(([id, p]) => !p.assignedTo && id !== currentUser.id);
+  const segmentCount = entries.length;
+  if (segmentCount === 0) {
+    spinBtn.disabled = false;
+    return alert("Personne disponible.");
+  }
 
-  const spins = 5 + Math.floor(Math.random()*3);
-  const randomAngle = Math.random()*360;
-  const finalRotation = currentRotation + spins*360 + randomAngle;
+  const spins = 5 + Math.floor(Math.random() * 3); // tours complets
+  const segmentAngle = 360 / segmentCount;
+  const randomIndex = Math.floor(Math.random() * segmentCount); // segment choisi
+  const randomOffset = Math.random() * segmentAngle; // position aléatoire dans le segment
+
+  // On calcule l'angle final pour que le segment choisi soit centré sous l'indicateur (0°)
+  const finalRotation = currentRotation + spins * 360 + (randomIndex * segmentAngle + segmentAngle / 2 + randomOffset);
   currentRotation = finalRotation % 360;
 
-  wheel.style.transition='transform 5s cubic-bezier(0.17,0.89,0.32,1.28)';
-  wheel.style.transform=`rotate(${finalRotation}deg)`;
+  // Animation de la roue
+  wheel.style.transition = "transform 5s cubic-bezier(0.17,0.89,0.32,1.28)";
+  wheel.style.transform = `rotate(${finalRotation}deg)`;
 
-  setTimeout(()=>{ wheel.classList.add('glow'); setTimeout(()=>wheel.classList.remove('glow'),1500); },4900);
+  setTimeout(() => {
+    wheel.classList.add("glow");
+    setTimeout(() => wheel.classList.remove("glow"), 1500);
+  }, 4900);
 
-  setTimeout(async()=>{
-    const segmentCount = entries.length;
-    const segmentAngle = 360 / segmentCount;
-    const adjustedAngle = (360 - (currentRotation % 360) + segmentAngle/2) % 360;
-    const index = Math.floor(adjustedAngle / segmentAngle);
-    const picked = entries[index][0];
+  setTimeout(async () => {
+    // On récupère le segment final exactement aligné avec l'indicateur
+    const pickedIndex = Math.floor((currentRotation % 360) / segmentAngle) % segmentCount;
+    const picked = entries[pickedIndex][0];
 
-    try{
-      const targetRef=doc(db,'people',picked);
-      const meRef=doc(db,'people',currentUser.id);
-      await updateDoc(targetRef,{available:false,assignedTo:currentUser.id});
-      await updateDoc(meRef,{assignedTo:picked});
-      result.innerHTML=`Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
+    try {
+      const targetRef = doc(db, "people", picked);
+      const meRef = doc(db, "people", currentUser.id);
+      await updateDoc(targetRef, { available: false, assignedTo: currentUser.id });
+      await updateDoc(meRef, { assignedTo: picked });
+      result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
       refreshMyStatus();
-    }catch(e){console.error(e); alert('Erreur : '+e.message);}
-    finally{spinBtn.disabled=false;}
-  },5200);
+    } catch (e) {
+      console.error(e);
+      alert("Erreur : " + e.message);
+    } finally {
+      spinBtn.disabled = false;
+    }
+  }, 5200);
 });
+
 
 const snowContainer = document.getElementById('snow');
 const flakeCount = 80;
