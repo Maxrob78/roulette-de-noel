@@ -12,7 +12,6 @@
   --text: #e6eef5;
   --glass: rgba(255,255,255,0.05);
 }
-
 * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
 body {
   margin: 0;
@@ -23,7 +22,6 @@ body {
   flex-direction: column;
   align-items: center;
 }
-
 header { margin-top: 30px; text-align: center; }
 h1 {
   font-size: 28px;
@@ -32,7 +30,6 @@ h1 {
   -webkit-text-fill-color: transparent;
   margin: 0 0 12px 0;
 }
-
 .card {
   background: var(--glass);
   backdrop-filter: blur(6px);
@@ -41,7 +38,6 @@ h1 {
   box-shadow: 0 4px 30px rgba(0,0,0,0.3);
   margin-bottom: 20px;
 }
-
 .login {
   display: flex;
   flex-wrap: wrap;
@@ -49,7 +45,6 @@ h1 {
   align-items: center;
   justify-content: center;
 }
-
 select, input[type="password"] {
   padding: 10px;
   border-radius: 8px;
@@ -58,7 +53,6 @@ select, input[type="password"] {
   border: 1px solid rgba(255,255,255,0.1);
   cursor: pointer;
 }
-
 button.luminous {
   position: relative;
   background: linear-gradient(90deg, #dc2626, #16a34a, #f59e0b);
@@ -82,13 +76,11 @@ button.luminous:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 @keyframes buttonGlow {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-
 .roulette-container {
   margin-top: 30px;
   display: flex;
@@ -97,13 +89,11 @@ button.luminous:disabled {
   gap: 20px;
   position: relative;
 }
-
 .wheel-wrapper {
   position: relative;
   width: 360px;
   height: 360px;
 }
-
 .wheel {
   width: 100%;
   height: 100%;
@@ -113,19 +103,18 @@ button.luminous:disabled {
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
   transform: rotate(0deg);
 }
-
 .segment-text {
   position: absolute;
   top: 50%;
   left: 50%;
   transform-origin: 0 0;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   color: white;
   text-shadow: 0 0 3px rgba(0,0,0,0.7);
   white-space: nowrap;
+  pointer-events: none;
 }
-
 .indicator {
   width: 0;
   height: 0;
@@ -139,7 +128,6 @@ button.luminous:disabled {
   filter: drop-shadow(0 0 6px var(--accent));
   z-index: 2;
 }
-
 .result {
   font-size: 20px;
   font-weight: 700;
@@ -147,7 +135,6 @@ button.luminous:disabled {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .list {
   max-width: 360px;
   background: rgba(255,255,255,0.03);
@@ -157,12 +144,10 @@ button.luminous:disabled {
   max-height: 300px;
   overflow-y: auto;
 }
-
 .wheel.glow {
   box-shadow: 0 0 30px 10px rgba(250, 204, 21, 0.7);
   transition: box-shadow 0.6s ease-out;
 }
-
 .snow {
   position: fixed;
   top: 0;
@@ -173,7 +158,6 @@ button.luminous:disabled {
   overflow: hidden;
   z-index: 0;
 }
-
 .snowflake {
   position: absolute;
   top: -10px;
@@ -183,20 +167,16 @@ button.luminous:disabled {
   animation: fall linear infinite;
   user-select: none;
 }
-
 @keyframes fall {
   0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
   50% { opacity: 0.8; }
   100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
-
 .person { display: flex; justify-content: space-between; padding: 6px 8px; border-bottom: 1px dashed rgba(255,255,255,0.05);}
 .badge { padding: 4px 8px; border-radius: 999px; font-size: 12px; }
 .badge.available { background: rgba(34,197,94,0.25); color: #bbf7d0; }
 .badge.assigned { background: rgba(239,68,68,0.25); color: #fecaca; }
-
 footer { margin-top: 40px; font-size: 13px; color: #9fb0c8; text-align: center; }
-
 @media (max-width: 700px) {
   .wheel-wrapper { width: 280px; height: 280px; }
   .list { max-width: 90vw; }
@@ -343,13 +323,11 @@ function refreshMyStatus() {
   }
 }
 
-// Fonction pour afficher la roue avec noms lisibles
 function renderWheel() {
   wheel.innerHTML = '';
   if (!currentUser) return;
   const entries = Object.entries(peopleCache).filter(([id]) => id !== currentUser.id);
   const count = entries.length;
-  // couleur globale de la roue
   const gradientColors = [];
   entries.forEach(([id,p],i)=>{
     const start = (i*100/count).toFixed(2);
@@ -359,12 +337,10 @@ function renderWheel() {
   });
   wheel.style.background = `conic-gradient(${gradientColors.join(',')})`;
 
-  // noms
   entries.forEach(([id,p],i)=>{
     const angle = i * 360 / count + 360/(2*count);
     const txt = document.createElement('div');
     txt.className = 'segment-text';
-    const rad = angle * Math.PI / 180;
     const radius = wheel.offsetWidth/2 - 30;
     txt.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(${-angle}deg)`;
     txt.textContent = id;
@@ -372,7 +348,6 @@ function renderWheel() {
   });
 }
 
-// spin avec 2 tours supplémentaires
 spinBtn.addEventListener('click', async () => {
   if (!currentUser) return alert('Connectez-vous d\'abord');
   spinBtn.disabled = true;
@@ -391,7 +366,7 @@ spinBtn.addEventListener('click', async () => {
   const index = entries.findIndex(([id])=>id===picked);
 
   const targetAngle = 360 - (index * segmentAngle + segmentAngle / 2);
-  const spins = 5 + 2; // 2 tours supplémentaires
+  const spins = 5 + 2;
   const finalRotation = currentRotation + spins*360 + targetAngle;
   currentRotation = finalRotation % 360;
 
@@ -413,7 +388,6 @@ spinBtn.addEventListener('click', async () => {
   },5200);
 });
 
-// ❄️ Neige animée
 const snowContainer = document.getElementById('snow');
 const flakeCount = 80;
 for(let i=0;i<flakeCount;i++){
