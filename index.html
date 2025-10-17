@@ -324,6 +324,7 @@ function refreshMyStatus() {
 }
 
 // --- Roue avec noms alignés ---
+// --- Roue avec noms alignés et texte lisible ---
 function renderWheel() {
   wheel.innerHTML = '';
   if (!currentUser) return;
@@ -332,20 +333,20 @@ function renderWheel() {
   if (count === 0) return;
 
   // Fond de la roue
-  const gradientColors = entries.map(([id,p], i) => {
-    const start = (i*100/count).toFixed(2);
-    const end = ((i+1)*100/count).toFixed(2);
-    const hue = i*360/count;
+  const gradientColors = entries.map(([id, p], i) => {
+    const start = (i * 100 / count).toFixed(2);
+    const end = ((i + 1) * 100 / count).toFixed(2);
+    const hue = i * 360 / count;
     return p.assignedTo ? `#555 ${start}% ${end}%` : `hsl(${hue},70%,50%) ${start}% ${end}%`;
   });
   wheel.style.background = `conic-gradient(${gradientColors.join(',')})`;
 
   // Texte dans chaque segment
-  const radius = wheel.offsetWidth/2 - 30; // distance du centre
+  const radius = wheel.offsetWidth / 2 - 30;
   entries.forEach(([id], i) => {
     const segmentAngle = 360 / count;
-    const angle = i * segmentAngle + segmentAngle/2; // centre du segment
-    const rad = (angle - 90) * Math.PI / 180; // -90 pour que 0° soit en haut
+    const angle = i * segmentAngle + segmentAngle / 2;
+    const rad = (angle - 90) * Math.PI / 180;
     const x = radius * Math.cos(rad);
     const y = radius * Math.sin(rad);
 
@@ -354,12 +355,14 @@ function renderWheel() {
     txt.textContent = id;
     txt.style.left = `calc(50% + ${x}px)`;
     txt.style.top = `calc(50% + ${y}px)`;
-    txt.style.transform = `translate(-50%, -50%)`; // centrer le texte sur ce point
     txt.style.whiteSpace = 'nowrap';
+
+    // Texte toujours lisible, ne pas tourner
+    txt.style.transform = `translate(-50%, -50%)`;
+
     wheel.appendChild(txt);
   });
 }
-
 
 spinBtn.addEventListener('click', async () => {
   if (!currentUser) return alert("Connectez-vous d'abord");
@@ -423,7 +426,6 @@ spinBtn.addEventListener('click', async () => {
     }
   }, 5200);
 });
-
 
 
 const snowContainer = document.getElementById('snow');
