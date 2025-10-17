@@ -61,7 +61,9 @@ select, input[type="password"] {
 
 button.luminous {
   position: relative;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  background: linear-gradient(90deg, #dc2626, #16a34a, #f59e0b);
+  background-size: 300% 100%;
+  animation: buttonGlow 4s linear infinite;
   color: white;
   border: none;
   border-radius: 10px;
@@ -79,6 +81,12 @@ button.luminous:hover {
 button.luminous:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@keyframes buttonGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .roulette-container {
@@ -161,40 +169,34 @@ button.luminous:disabled {
   transition: box-shadow 0.6s ease-out;
 }
 
-/* Neige douce en fond */
-body::before {
-  content: "";
+/* ❄️ Neige */
+.snow {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(white 1px, transparent 1px);
-  background-size: 4px 4px;
-  opacity: 0.15;
-  animation: snow 10s linear infinite;
   pointer-events: none;
+  overflow: hidden;
   z-index: 0;
 }
 
-@keyframes snow {
-  from { background-position: 0 0; }
-  to { background-position: 0 100vh; }
+.snowflake {
+  position: absolute;
+  top: -10px;
+  color: white;
+  font-size: 1em;
+  opacity: 0.8;
+  animation: fall linear infinite;
+  user-select: none;
 }
 
-/* Lueur de Noël sur les boutons */
-button.luminous {
-  background: linear-gradient(90deg, #dc2626, #16a34a, #f59e0b);
-  background-size: 300% 100%;
-  animation: buttonGlow 4s linear infinite;
+@keyframes fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
 
-@keyframes buttonGlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-  
 .person { display: flex; justify-content: space-between; padding: 6px 8px; border-bottom: 1px dashed rgba(255,255,255,0.05);}
 .badge { padding: 4px 8px; border-radius: 999px; font-size: 12px; }
 .badge.available { background: rgba(34,197,94,0.25); color: #bbf7d0; }
@@ -234,6 +236,8 @@ footer { margin-top: 40px; font-size: 13px; color: #9fb0c8; text-align: center; 
   ⚙️ Connecté à Firestore : roulette-372ab
 </footer>
 
+<div class="snow" id="snow"></div>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
 import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
@@ -262,7 +266,7 @@ const wheel = document.getElementById('wheel');
 
 let currentUser = null;
 let peopleCache = {};
-let currentRotation = 0; // pour suivre la rotation cumulative
+let currentRotation = 0;
 
 const peopleCol = collection(db, 'people');
 onSnapshot(peopleCol, snap => {
@@ -274,7 +278,6 @@ onSnapshot(peopleCol, snap => {
 function renderUI() {
   loginSelect.innerHTML = '';
   peopleList.innerHTML = '';
-
   const ids = Object.keys(peopleCache).sort();
   ids.forEach(id => {
     const opt = document.createElement('option');
@@ -295,7 +298,6 @@ function renderUI() {
   refreshMyStatus();
 }
 
-// Login / mot de passe null
 loginBtn.addEventListener('click', async () => {
   const id = loginSelect.value;
   const password = passwordInput.value.trim();
@@ -351,7 +353,6 @@ function refreshMyStatus() {
 function renderWheel() {
   wheel.innerHTML = '';
   if (!currentUser) return;
-
   const entries = Object.entries(peopleCache).filter(([id]) => id !== currentUser.id);
   const count = entries.length;
 
@@ -361,66 +362,62 @@ function renderWheel() {
     seg.textContent = id;
     const angle = i * 360 / count;
     seg.style.transform = `rotate(${angle}deg) translate(0, -50%)`;
-    if (p.available) {
-      seg.style.background = `conic-gradient(from ${angle}deg, hsl(${i * 360 / count},70%,40%), hsl(${i * 360 / count},70%,55%))`;
-    } else {
-      seg.style.background = `conic-gradient(from ${angle}deg, #555555, #777777)`;
-    }
+    seg.style.background = p.available ? `conic-gradient(from ${angle}deg, hsl(${i*360/count},70%,40%), hsl(${i*360/count},70%,55%))` : `conic-gradient(from ${angle}deg, #555555, #777777)`;
     wheel.appendChild(seg);
   });
 }
 
-// --- VERSION AMÉLIORÉE : roue fluide et synchronisée ---
 spinBtn.addEventListener('click', async () => {
   if (!currentUser) return alert('Connectez-vous d\'abord');
   spinBtn.disabled = true;
   result.textContent = 'Roulette en cours... 🎡';
 
-  const pool = Object.entries(peopleCache)
-    .filter(([id, p]) => p.available && id !== currentUser.id)
-    .map(([id]) => id);
+  const pool = Object.entries(peopleCache).filter(([id,p]) => p.available && id!==currentUser.id).map(([id])=>id);
+  if(pool.length===0){ spinBtn.disabled=false; return alert('Personne disponible.'); }
 
-  if (pool.length === 0) {
-    spinBtn.disabled = false;
-    return alert('Personne disponible.');
-  }
-
-  const picked = pool[Math.floor(Math.random() * pool.length)];
-  const entries = Object.entries(peopleCache).filter(([id]) => id !== currentUser.id);
+  const picked = pool[Math.floor(Math.random()*pool.length)];
+  const entries = Object.entries(peopleCache).filter(([id])=>id!==currentUser.id);
   const segmentCount = entries.length;
   const segmentAngle = 360 / segmentCount;
-  const index = entries.findIndex(([id]) => id === picked);
+  const index = entries.findIndex(([id])=>id===picked);
 
   const targetAngle = 360 - (index * segmentAngle + segmentAngle / 2);
   const spins = 5;
-  const finalRotation = currentRotation + spins * 360 + targetAngle;
+  const finalRotation = currentRotation + spins*360 + targetAngle;
   currentRotation = finalRotation % 360;
 
-  wheel.style.transition = 'transform 5s cubic-bezier(0.17, 0.89, 0.32, 1.28)';
-  wheel.style.transform = `rotate(${finalRotation}deg)`;
+  wheel.style.transition='transform 5s cubic-bezier(0.17,0.89,0.32,1.28)';
+  wheel.style.transform=`rotate(${finalRotation}deg)`;
 
-  // Effet lumineux de fin
-  setTimeout(() => {
-    wheel.classList.add('glow');
-    setTimeout(() => wheel.classList.remove('glow'), 1500);
-  }, 4900);
+  setTimeout(()=>{ wheel.classList.add('glow'); setTimeout(()=>wheel.classList.remove('glow'),1500); },4900);
 
-  setTimeout(async () => {
-    try {
-      const targetRef = doc(db, 'people', picked);
-      const meRef = doc(db, 'people', currentUser.id);
-      await updateDoc(targetRef, { available: false, assignedTo: currentUser.id });
-      await updateDoc(meRef, { assignedTo: picked });
-      result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
+  setTimeout(async()=>{
+    try{
+      const targetRef=doc(db,'people',picked);
+      const meRef=doc(db,'people',currentUser.id);
+      await updateDoc(targetRef,{available:false,assignedTo:currentUser.id});
+      await updateDoc(meRef,{assignedTo:picked});
+      result.innerHTML=`Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
       refreshMyStatus();
-    } catch (e) {
-      console.error(e);
-      alert('Erreur : ' + e.message);
-    } finally {
-      spinBtn.disabled = false;
-    }
-  }, 5200);
+    }catch(e){console.error(e);alert('Erreur : '+e.message);} 
+    finally{spinBtn.disabled=false;}
+  },5200);
 });
+
+// ❄️ Neige animée
+const snowContainer = document.getElementById('snow');
+const flakeCount = 80;
+for(let i=0;i<flakeCount;i++){
+  const flake=document.createElement('div');
+  flake.className='snowflake';
+  flake.textContent='❄';
+  const size=Math.random()*10+8; flake.style.fontSize=`${size}px`;
+  flake.style.left=`${Math.random()*100}%`;
+  flake.style.animationDuration=`${Math.random()*10+5}s`;
+  flake.style.opacity=Math.random()*0.5+0.5;
+  flake.style.animationDelay=`${Math.random()*10}s`;
+  snowContainer.appendChild(flake);
+}
 </script>
 </body>
 </html>
