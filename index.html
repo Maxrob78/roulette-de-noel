@@ -368,36 +368,43 @@ spinBtn.addEventListener('click', async () => {
 
   const entries = Object.entries(peopleCache).filter(([id, p]) => !p.assignedTo && id !== currentUser.id);
   const segmentCount = entries.length;
-  if (segmentCount === 0) { spinBtn.disabled = false; return alert("Personne disponible."); }
+  if (segmentCount === 0) { 
+    spinBtn.disabled = false; 
+    return alert("Personne disponible."); 
+  }
 
-  const spins = 5 + Math.floor(Math.random() * 3);
+  const spins = 5 + Math.floor(Math.random() * 3); // tours complets
   const segmentAngle = 360 / segmentCount;
-  const randomIndex = Math.floor(Math.random() * segmentCount);
-  const randomOffset = Math.random() * segmentAngle;
+  const randomIndex = Math.floor(Math.random() * segmentCount); // segment choisi
+  const randomOffset = Math.random() * segmentAngle; // position aléatoire dans le segment
 
-  // Angle final **cumulé**, jamais modulo
-  const finalRotation = currentRotation + spins * 360 + (randomIndex * segmentAngle + segmentAngle / 2 + randomOffset);
+  // Angle final cumulatif
+  const finalRotation = currentRotation + spins * 360 + (randomIndex * segmentAngle + randomOffset);
 
-  // Reset transition pour forcer le navigateur à prendre la rotation actuelle comme départ
+  // Reset transition pour que le navigateur prenne la rotation actuelle comme départ
   wheel.style.transition = "none";
   wheel.style.transform = `rotate(${currentRotation}deg)`;
 
-  // Forcer le rendu avant de lancer l'animation
+  // Forcer le rendu avant d’animer
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       wheel.style.transition = "transform 5s cubic-bezier(0.17,0.89,0.32,1.28)";
       wheel.style.transform = `rotate(${finalRotation}deg)`;
-      currentRotation = finalRotation;
+      currentRotation = finalRotation; // mise à jour cumulative
     });
   });
 
+  // Effet glow juste avant la fin
   setTimeout(() => {
     wheel.classList.add("glow");
     setTimeout(() => wheel.classList.remove("glow"), 1500);
   }, 4900);
 
+  // Détermination du segment exact sous l’indicateur
   setTimeout(async () => {
-    const pickedIndex = Math.floor(((currentRotation % 360) + segmentAngle/2) / segmentAngle) % segmentCount;
+    const normalizedAngle = currentRotation % 360;
+    let pickedIndex = Math.floor(normalizedAngle / segmentAngle);
+    pickedIndex = (segmentCount - pickedIndex) % segmentCount; // inversion car rotation conique
     const picked = entries[pickedIndex][0];
 
     try {
@@ -405,6 +412,7 @@ spinBtn.addEventListener('click', async () => {
       const meRef = doc(db, "people", currentUser.id);
       await updateDoc(targetRef, { available: false, assignedTo: currentUser.id });
       await updateDoc(meRef, { assignedTo: picked });
+
       result.innerHTML = `Résultat : <span style="color:#4ade80;font-weight:700">${picked}</span>`;
       refreshMyStatus();
     } catch (e) {
