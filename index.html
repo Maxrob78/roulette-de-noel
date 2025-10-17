@@ -100,8 +100,8 @@ button.luminous:disabled {
 
 .wheel-wrapper {
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 360px;
+  height: 360px;
 }
 
 .wheel {
@@ -122,13 +122,15 @@ button.luminous:disabled {
   left: 50%;
   transform-origin: 0% 0%;
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding: 10px;
-  font-size: 14px;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
   font-weight: bold;
   color: white;
-  text-shadow: 0 0 4px rgba(0,0,0,0.7);
+  text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  padding: 6px;
+  text-align: center;
+  word-break: break-word;
 }
 
 .indicator {
@@ -163,13 +165,11 @@ button.luminous:disabled {
   overflow-y: auto;
 }
 
-/* Effet de lueur quand la roue s'arrête */
 .wheel.glow {
   box-shadow: 0 0 30px 10px rgba(250, 204, 21, 0.7);
   transition: box-shadow 0.6s ease-out;
 }
 
-/* ❄️ Neige */
 .snow {
   position: fixed;
   top: 0;
@@ -205,7 +205,7 @@ button.luminous:disabled {
 footer { margin-top: 40px; font-size: 13px; color: #9fb0c8; text-align: center; }
 
 @media (max-width: 700px) {
-  .wheel-wrapper { width: 260px; height: 260px; }
+  .wheel-wrapper { width: 280px; height: 280px; }
   .list { max-width: 90vw; }
 }
 </style>
@@ -289,8 +289,8 @@ function renderUI() {
     const row = document.createElement('div');
     row.className = 'person';
     const badge = document.createElement('span');
-    badge.className = 'badge ' + (p.available ? 'available' : 'assigned');
-    badge.textContent = p.available ? 'disponible' : (id === currentUser?.id ? 'Vous avez tiré : ' + p.assignedTo : 'déjà attribué');
+    badge.className = 'badge ' + (p.assignedTo ? 'assigned' : 'available');
+    badge.textContent = p.assignedTo ? (id === currentUser?.id ? 'Vous avez tiré : ' + p.assignedTo : 'déjà attribué') : 'disponible';
     row.innerHTML = `<div>${id}</div>`;
     row.appendChild(badge);
     peopleList.appendChild(row);
@@ -330,7 +330,9 @@ loginBtn.addEventListener('click', async () => {
   passwordInput.value = '';
   refreshMyStatus();
   renderWheel();
-});
+}
+
+);
 
 function refreshMyStatus() {
   if (!currentUser) {
@@ -361,8 +363,9 @@ function renderWheel() {
     seg.className = 'segment';
     seg.textContent = id;
     const angle = i * 360 / count;
-    seg.style.transform = `rotate(${angle}deg) translate(0, -50%)`;
-    seg.style.background = p.available ? `conic-gradient(from ${angle}deg, hsl(${i*360/count},70%,40%), hsl(${i*360/count},70%,55%))` : `conic-gradient(from ${angle}deg, #555555, #777777)`;
+    // rotation du segment
+    seg.style.transform = `rotate(${angle}deg) translate(0, -50%) rotate(${90 - angle}deg)`;
+    seg.style.background = p.assignedTo ? `conic-gradient(from ${angle}deg, #555555, #777777)` : `conic-gradient(from ${angle}deg, hsl(${i*360/count},70%,40%), hsl(${i*360/count},70%,55%))`;
     wheel.appendChild(seg);
   });
 }
@@ -372,7 +375,10 @@ spinBtn.addEventListener('click', async () => {
   spinBtn.disabled = true;
   result.textContent = 'Roulette en cours... 🎡';
 
-  const pool = Object.entries(peopleCache).filter(([id,p]) => p.available && id!==currentUser.id).map(([id])=>id);
+  const pool = Object.entries(peopleCache)
+    .filter(([id,p]) => !p.assignedTo && id!==currentUser.id)
+    .map(([id])=>id);
+
   if(pool.length===0){ spinBtn.disabled=false; return alert('Personne disponible.'); }
 
   const picked = pool[Math.floor(Math.random()*pool.length)];
