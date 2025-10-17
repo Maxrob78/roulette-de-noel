@@ -378,13 +378,15 @@ spinBtn.addEventListener('click', async () => {
   const randomIndex = Math.floor(Math.random() * segmentCount); // segment choisi
   const randomOffset = Math.random() * segmentAngle; // position aléatoire dans le segment
 
-  // On calcule l'angle final pour que le segment choisi soit centré sous l'indicateur (0°)
+  // Angle final **cumulé** sans modulo
   const finalRotation = currentRotation + spins * 360 + (randomIndex * segmentAngle + segmentAngle / 2 + randomOffset);
-  currentRotation = finalRotation % 360;
 
   // Animation de la roue
   wheel.style.transition = "transform 5s cubic-bezier(0.17,0.89,0.32,1.28)";
   wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+  // On stocke la rotation réelle, pas modulo
+  currentRotation = finalRotation;
 
   setTimeout(() => {
     wheel.classList.add("glow");
@@ -392,8 +394,8 @@ spinBtn.addEventListener('click', async () => {
   }, 4900);
 
   setTimeout(async () => {
-    // On récupère le segment final exactement aligné avec l'indicateur
-    const pickedIndex = Math.floor((currentRotation % 360) / segmentAngle) % segmentCount;
+    // Utiliser modulo ici seulement pour trouver le segment final
+    const pickedIndex = Math.floor(((currentRotation % 360) + segmentAngle/2) / segmentAngle) % segmentCount;
     const picked = entries[pickedIndex][0];
 
     try {
@@ -411,6 +413,7 @@ spinBtn.addEventListener('click', async () => {
     }
   }, 5200);
 });
+
 
 
 const snowContainer = document.getElementById('snow');
