@@ -107,13 +107,13 @@ button.luminous:disabled {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform-origin: 0 0;
   font-size: 12px;
   font-weight: bold;
   color: white;
   text-shadow: 0 0 3px rgba(0,0,0,0.7);
   white-space: nowrap;
   pointer-events: none;
+  transform-origin: center center;
 }
 .indicator {
   width: 0;
@@ -323,27 +323,38 @@ function refreshMyStatus() {
   }
 }
 
+// --- Roue avec noms alignés ---
 function renderWheel() {
   wheel.innerHTML = '';
   if (!currentUser) return;
   const entries = Object.entries(peopleCache).filter(([id]) => id !== currentUser.id);
   const count = entries.length;
-  const gradientColors = [];
-  entries.forEach(([id,p],i)=>{
+  if (count === 0) return;
+
+  // Fond de la roue
+  const gradientColors = entries.map(([id,p], i) => {
     const start = (i*100/count).toFixed(2);
     const end = ((i+1)*100/count).toFixed(2);
     const hue = i*360/count;
-    gradientColors.push(p.assignedTo ? `#555 ${start}% ${end}%` : `hsl(${hue},70%,50%) ${start}% ${end}%`);
+    return p.assignedTo ? `#555 ${start}% ${end}%` : `hsl(${hue},70%,50%) ${start}% ${end}%`;
   });
   wheel.style.background = `conic-gradient(${gradientColors.join(',')})`;
 
-  entries.forEach(([id,p],i)=>{
-    const angle = i * 360 / count + 360/(2*count);
+  // Noms correctement positionnés
+  entries.forEach(([id], i) => {
+    const segmentAngle = 360 / count;
+    const angle = i * segmentAngle + segmentAngle/2; // centre du segment
+    const rad = (angle-90) * Math.PI / 180; // -90 pour aligner vertical haut
+    const radius = wheel.offsetWidth/2 - 40;
+    const x = radius * Math.cos(rad);
+    const y = radius * Math.sin(rad);
+
     const txt = document.createElement('div');
     txt.className = 'segment-text';
-    const radius = wheel.offsetWidth/2 - 30;
-    txt.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(${-angle}deg)`;
     txt.textContent = id;
+    txt.style.left = '50%';
+    txt.style.top = '50%';
+    txt.style.transform = `translate(${x}px, ${y}px) rotate(${angle}deg)`;
     wheel.appendChild(txt);
   });
 }
@@ -356,7 +367,7 @@ spinBtn.addEventListener('click', async () => {
   const entries = Object.entries(peopleCache).filter(([id,p]) => !p.assignedTo && id !== currentUser.id);
   if(entries.length === 0){ spinBtn.disabled = false; return alert('Personne disponible.'); }
 
-  const spins = 5 + Math.floor(Math.random()*3); // tours aléatoires
+  const spins = 5 + Math.floor(Math.random()*3);
   const randomAngle = Math.random()*360;
   const finalRotation = currentRotation + spins*360 + randomAngle;
   currentRotation = finalRotation % 360;
